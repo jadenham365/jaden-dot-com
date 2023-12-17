@@ -26,6 +26,11 @@
         let isArrowUpPressed = false;
         let isArrowDownPressed = false;
         let playerChar = document.getElementById('me');
+        let facingLeft = true;
+        let currentFrame = 0;
+        let lastTimestamp = 0;
+        let frameRate = 3;
+        let step = 3;
 
         document.addEventListener('keydown', function(event) {
             switch(event.key) {
@@ -34,12 +39,14 @@
                 case 'D':
                     event.preventDefault();
                     isArrowRightPressed = true;
+                    facingLeft = false;
                     break;
                 case 'ArrowLeft':
                 case 'a':
                 case 'A':
                     event.preventDefault();
                     isArrowLeftPressed = true;
+                    facingLeft = true;
                     break;
                 case 'ArrowUp':
                 case 'w':
@@ -62,42 +69,74 @@
                 case 'd':
                 case 'D':
                     isArrowRightPressed = false;
+                    playerChar.src = 'sprites/character-me-still-front-right.png';
                     break;
                 case 'ArrowLeft':
                 case 'a':
                 case 'A':
                     isArrowLeftPressed = false;
+                    playerChar.src = 'sprites/character-me-still-front-left.png';
                     break;
                 case 'ArrowUp':
                 case 'w':
                 case 'W':
                     isArrowUpPressed = false;
+                    if (facingLeft) {
+                        playerChar.src = 'sprites/character-me-still-front-left.png'
+                    }
+                    if (!facingLeft) {
+                        playerChar.src = 'sprites/character-me-still-front-right.png'
+                    }
                     break;
                 case 'ArrowDown':
                 case 's':
                 case 'S':
                     isArrowDownPressed = false;
-                    break;
+                    if (facingLeft) {
+                        playerChar.src = 'sprites/character-me-still-front-left.png'
+                    }
+                    if (!facingLeft) {
+                        playerChar.src = 'sprites/character-me-still-front-right.png'
+                    }                    break;
             }
         });
 
-        function moveCharacter() {
-            if (isArrowRightPressed) {
-                playerChar.style.left = (parseInt(playerChar.style.left) || 0) + 10 + 'px';
+        function moveCharacter(timestamp) {
+            let elapsedMilliseconds = timestamp - lastTimestamp;
+            let elapsedSeconds = elapsedMilliseconds / 1000;
+            let frameTime = 1 / frameRate;
+
+            if (elapsedSeconds >= frameTime) {
+                currentFrame = (currentFrame === 1) ? 2 : 1;
+
+                if (isArrowRightPressed) {
+                    playerChar.src = `sprites/character-me-walking-front-right-${currentFrame}.png`;
+                } else if (isArrowLeftPressed) {
+                    playerChar.src = `sprites/character-me-walking-front-left-${currentFrame}.png`;
+                } else if (isArrowUpPressed || isArrowDownPressed) {
+                    if (facingLeft) {
+                        playerChar.src = `sprites/character-me-walking-front-left-${currentFrame}.png`;
+                    } else {
+                        playerChar.src = `sprites/character-me-walking-front-right-${currentFrame}.png`;
+                    }
+                }
+
+                lastTimestamp = timestamp;
             }
-            if (isArrowLeftPressed) {
-                playerChar.style.left = (parseInt(playerChar.style.left) || 0) - 10 + 'px';
-            }
-            if (isArrowUpPressed) {
-                playerChar.style.top = (parseInt(playerChar.style.top) || 0) - 10 + 'px';
-            }
-            if (isArrowDownPressed) {
-                playerChar.style.top = (parseInt(playerChar.style.top) || 0) + 10 + 'px';
-            }
+
+            let moveX = (isArrowRightPressed ? 1 : 0) - (isArrowLeftPressed ? 1 : 0);
+            let moveY = (isArrowDownPressed ? 1 : 0) - (isArrowUpPressed ? 1 : 0);
+            let length = Math.sqrt(moveX * moveX + moveY * moveY);
+            let normalizedMoveX = length === 0 ? 0 : moveX / length;
+            let normalizedMoveY = length === 0 ? 0 : moveY / length;
+
+            playerChar.style.left = (parseInt(playerChar.style.left) || 0) + normalizedMoveX * step + 'px';
+            playerChar.style.top = (parseInt(playerChar.style.top) || 0) + normalizedMoveY * step + 'px';
+
             requestAnimationFrame(moveCharacter);
         }
 
-        moveCharacter();
+        requestAnimationFrame(moveCharacter);
     </script>
 </body>
 </html>
