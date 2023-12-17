@@ -18,7 +18,7 @@
     </style>
 </head>
 <body>
-    <img id="me" src="sprites/character-me-still-front-left.png" alt="a pixel art character of the website's creator">
+    <img id="me" src="sprites/character-me-still-front-left.svg" alt="a pixel art character of the website's creator">
 
     <script>
         let isArrowRightPressed = false;
@@ -69,23 +69,23 @@
                 case 'd':
                 case 'D':
                     isArrowRightPressed = false;
-                    playerChar.src = 'sprites/character-me-still-front-right.png';
+                    playerChar.src = 'sprites/character-me-still-front-right.svg';
                     break;
                 case 'ArrowLeft':
                 case 'a':
                 case 'A':
                     isArrowLeftPressed = false;
-                    playerChar.src = 'sprites/character-me-still-front-left.png';
+                    playerChar.src = 'sprites/character-me-still-front-left.svg';
                     break;
                 case 'ArrowUp':
                 case 'w':
                 case 'W':
                     isArrowUpPressed = false;
                     if (facingLeft) {
-                        playerChar.src = 'sprites/character-me-still-front-left.png'
+                        playerChar.src = 'sprites/character-me-still-front-left.svg'
                     }
                     if (!facingLeft) {
-                        playerChar.src = 'sprites/character-me-still-front-right.png'
+                        playerChar.src = 'sprites/character-me-still-front-right.svg'
                     }
                     break;
                 case 'ArrowDown':
@@ -93,10 +93,10 @@
                 case 'S':
                     isArrowDownPressed = false;
                     if (facingLeft) {
-                        playerChar.src = 'sprites/character-me-still-front-left.png'
+                        playerChar.src = 'sprites/character-me-still-front-left.svg'
                     }
                     if (!facingLeft) {
-                        playerChar.src = 'sprites/character-me-still-front-right.png'
+                        playerChar.src = 'sprites/character-me-still-front-right.svg'
                     }                    break;
             }
         });
@@ -110,14 +110,14 @@
                 currentFrame = (currentFrame === 1) ? 2 : 1;
 
                 if (isArrowRightPressed) {
-                    playerChar.src = `sprites/character-me-walking-front-right-${currentFrame}.png`;
+                    playerChar.src = `sprites/character-me-walking-front-right${currentFrame}.svg`;
                 } else if (isArrowLeftPressed) {
-                    playerChar.src = `sprites/character-me-walking-front-left-${currentFrame}.png`;
+                    playerChar.src = `sprites/character-me-walking-front-left${currentFrame}.svg`;
                 } else if (isArrowUpPressed || isArrowDownPressed) {
                     if (facingLeft) {
-                        playerChar.src = `sprites/character-me-walking-front-left-${currentFrame}.png`;
+                        playerChar.src = `sprites/character-me-walking-front-left${currentFrame}.svg`;
                     } else {
-                        playerChar.src = `sprites/character-me-walking-front-right-${currentFrame}.png`;
+                        playerChar.src = `sprites/character-me-walking-front-right${currentFrame}.svg`;
                     }
                 }
 
