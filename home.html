@@ -9,6 +9,25 @@
             width: 100vw;
         }
 
+        #room {
+            position: absolute;
+            z-index: -2;
+            height: auto;
+            width: 1400px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .walkable {
+            position: absolute;
+            z-index: 1;
+            height: 100%;
+            width: 100%;
+            clip-path: polygon(0 75%, 25% 50%, 50% 60%, 75% 50%, 100% 75%, 50% 100%);
+            
+        }
+
         #me {
             position: absolute;
             top: 0;
@@ -18,7 +37,9 @@
     </style>
 </head>
 <body>
+    <div class="walkable"> </div>
     <img id="me" src="sprites/character-me-still-front-left.svg" alt="a pixel art character of the website's creator">
+    <img id="room" src="scenes/homepage.svg" alt="a drawing of a museum room which serves as the site's homepage">
 
     <script>
         let isArrowRightPressed = false;
@@ -97,7 +118,8 @@
                     }
                     if (!facingLeft) {
                         playerChar.src = 'sprites/character-me-still-front-right.svg'
-                    }                    break;
+                    }                    
+                    break;
             }
         });
 
@@ -130,8 +152,19 @@
             let normalizedMoveX = length === 0 ? 0 : moveX / length;
             let normalizedMoveY = length === 0 ? 0 : moveY / length;
 
-            playerChar.style.left = (parseInt(playerChar.style.left) || 0) + normalizedMoveX * step + 'px';
-            playerChar.style.top = (parseInt(playerChar.style.top) || 0) + normalizedMoveY * step + 'px';
+            let newLeft = (parseInt(playerChar.style.left) || 0) + normalizedMoveX * step;
+            let newTop = (parseInt(playerChar.style.top) || 0) + normalizedMoveY * step;
+
+            let roomWidth = document.querySelector('.walkable').offsetWidth;
+            let roomHeight = document.querySelector('.walkable').offsetHeight;
+
+            if (newLeft >= 0 && newLeft + playerChar.offsetWidth <= roomWidth) {
+                playerChar.style.left = newLeft + 'px';
+            }
+
+            if (newTop >= 0 && newTop + playerChar.offsetHeight <= roomHeight) {
+                playerChar.style.top = newTop + 'px';
+            }
 
             requestAnimationFrame(moveCharacter);
         }
