@@ -22,24 +22,27 @@
         .walkable {
             position: absolute;
             z-index: 1;
-            height: 100%;
-            width: 100%;
-            clip-path: polygon(0 75%, 25% 50%, 50% 60%, 75% 50%, 100% 75%, 50% 100%);
+            top: 325px;
+            left: 100px;
+            height: 310px;
+            width: 1250px;
+            /*clip-path: polygon(0% 46%, 24% 18%, 50% 45%, 75% 18%, 100% 45%, 49% 100%);*/
+            background-color: rgba(0, 0, 0, 0.5);
+            overflow: visible;
             
         }
 
         #me {
             position: absolute;
-            top: 0;
-            left: 0;
             transition: top 0.1s linear, left 0.1s linear;
         }
     </style>
 </head>
 <body>
-    <div class="walkable"> </div>
-    <img id="me" src="sprites/character-me-still-front-left.svg" alt="a pixel art character of the website's creator">
     <img id="room" src="scenes/homepage.svg" alt="a drawing of a museum room which serves as the site's homepage">
+    <div class="walkable"> 
+        <img style="top: 170px; left: 586px" id="me" src="sprites/character-me-still-front-left.svg" alt="a pixel art character of the website's creator">
+    </div>
 
     <script>
         let isArrowRightPressed = false;
@@ -152,19 +155,8 @@
             let normalizedMoveX = length === 0 ? 0 : moveX / length;
             let normalizedMoveY = length === 0 ? 0 : moveY / length;
 
-            let newLeft = (parseInt(playerChar.style.left) || 0) + normalizedMoveX * step;
-            let newTop = (parseInt(playerChar.style.top) || 0) + normalizedMoveY * step;
-
-            let roomWidth = document.querySelector('.walkable').offsetWidth;
-            let roomHeight = document.querySelector('.walkable').offsetHeight;
-
-            if (newLeft >= 0 && newLeft + playerChar.offsetWidth <= roomWidth) {
-                playerChar.style.left = newLeft + 'px';
-            }
-
-            if (newTop >= 0 && newTop + playerChar.offsetHeight <= roomHeight) {
-                playerChar.style.top = newTop + 'px';
-            }
+            playerChar.style.left = (parseInt(playerChar.style.left) || 0) + normalizedMoveX * step + 'px';
+            playerChar.style.top = (parseInt(playerChar.style.top) || 0) + normalizedMoveY * step + 'px';
 
             requestAnimationFrame(moveCharacter);
         }
