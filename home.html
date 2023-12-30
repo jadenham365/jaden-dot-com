@@ -4,46 +4,149 @@
     <meta charset="utf-8">
     <title>jaden dot com</title>
     <style>
+        @font-face {
+        font-family: 'RetroGame';
+        src: url('PressStart2P-Regular.ttf') format('truetype');
+        }
+
         body {
             height: 100vh;
             width: 100vw;
         }
 
-        #room {
+        canvas {
             position: absolute;
-            z-index: -2;
-            height: auto;
-            width: 1400px;
-            top: 50%;
             left: 50%;
+            top: 50%;
+            width: 1200px;
+            height: 675px;
+            border: 5px solid black;
             transform: translate(-50%, -50%);
         }
 
-        .walkable {
+        #room {
             position: absolute;
-            z-index: 1;
-            top: 325px;
-            left: 100px;
-            height: 310px;
-            width: 1250px;
-            /*clip-path: polygon(0% 46%, 24% 18%, 50% 45%, 75% 18%, 100% 45%, 49% 100%);*/
-            background-color: rgba(0, 0, 0, 0.5);
-            overflow: visible;
-            
+            z-index: -2;
+            top: 50%;
+            left: 50%;
+            height: auto;
+            width: 1200px;
+            transform: translate(-50%, -50%);
+        }
+
+        #walkable {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 1200px;
+            height: 675px;
+            /*background-color: rgba(0, 0, 0, 0.5);*/
+            clip-path: polygon(5.3% 55%, 27.5% 45%, 50% 55%, 72.3% 45%, 94.7% 55%, 94.7% 64.5%, 50% 86%, 5.3% 64.5%);
         }
 
         #me {
             position: absolute;
             transition: top 0.1s linear, left 0.1s linear;
         }
+
+        #textContainer {
+            position: absolute;
+            z-index: 2;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'RetroGame';
+        }
+
+        #siteTitle {
+            position: absolute;
+            left: 615px;
+            top: 115px;
+            transform: rotate(-15deg) skew(-15deg);
+        }
+
+        #pageTitle {
+            position: absolute;
+            left: 155px;
+            top: 120px;
+            transform: rotate(-15deg) skew(-15deg);
+        }
+
+        #controls {
+            position: absolute;
+            top: 630px;
+            left: 20px;
+        }
+
+        .cautionTape {
+            position: absolute;
+            transform: scale(.2);
+        }
+
+        #door1 {
+            top: 260px;
+            left: -160px;
+        }
+
+        #door2 {
+            top: 220px;
+            left: -40px;
+        }
+
+        #door3 {
+            top: 220px;
+            left: 100px;
+        }
+
+        #door4 {
+            top: 260px;
+            left: 220px;
+        }
+
+        #door5 {
+            top: 260px;
+            left: 380px;
+        }
+
+        #door6 {
+            top: 220px;
+            left: 500px;
+        }
+
+        #door7 {
+            top: 220px;
+            left: 640px;
+        }
+
+        #door8 {
+            top: 260px;
+            left: 760px;
+        }
+
     </style>
 </head>
 <body>
+    <canvas style="width: 1200px; height: 675px" id="canvas"></canvas>
     <img id="room" src="scenes/homepage.svg" alt="a drawing of a museum room which serves as the site's homepage">
-    <div class="walkable"> 
-        <img style="top: 170px; left: 586px" id="me" src="sprites/character-me-still-front-left.svg" alt="a pixel art character of the website's creator">
+    <div style="width: 1200px; height: 675px" id="walkable">
+        <img style="left: 0; top: 0" id="me" src="sprites/character-me-still-front-left.svg" alt="a pixel art character of the website's creator">
     </div>
-
+    <div style="width: 1200px; height: 675px" id="textContainer">
+        <h3 id="siteTitle">jaden dot com</h3>
+        <h3 id="pageTitle">home</h3>
+        <h6 id="controls"> use the arrow keys or WASD to walk around the museum</h6>
+        <img class="cautionTape" id="door1" src="sprites/construction.gif" alt="caution tape showing this website is under construction">
+        <img class="cautionTape" id="door2" src="sprites/construction.gif">
+        <img class="cautionTape" id="door3" src="sprites/construction.gif">
+        <img class="cautionTape" id="door4" src="sprites/construction.gif">
+        <img class="cautionTape" id="door5" src="sprites/construction.gif">
+        <img class="cautionTape" id="door6" src="sprites/construction.gif">
+        <img class="cautionTape" id="door7" src="sprites/construction.gif">
+        <img class="cautionTape" id="door8" src="sprites/construction.gif">
+    </div>
+    
+    
     <script>
         let isArrowRightPressed = false;
         let isArrowLeftPressed = false;
@@ -55,6 +158,14 @@
         let lastTimestamp = 0;
         let frameRate = 3;
         let step = 3;
+
+        function setInitialPosition() {
+            let floor = document.getElementById('walkable')
+            let Width = parseInt(floor.style.width);
+            let Height = parseInt(floor.style.height);
+            playerChar.style.left = `${Width * .47}px`
+            playerChar.style.top = `${Height * .7}px`
+        }
 
         document.addEventListener('keydown', function(event) {
             switch(event.key) {
@@ -126,6 +237,24 @@
             }
         });
 
+        /*function playerCharOnFloor() {
+            let xPosRatio = parseInt(playerChar.style.left) / 1200;
+            let yPosRatio = parseInt(playerChar.style.top) / 675;
+            
+            if (0.053 <= xPosRatio <= 0.5 && yPosRatio > (xPosRatio-1.274)*(-.1/.222) && yPosRatio < (xPosRatio+.7375)*(.1/.225) && yPosRatio > (xPosRatio+1.288)*(.215/.447)) {
+                return true
+            }
+            if (0.5 <= xPosRatio <= 0.947 && yPosRatio > (xPosRatio-1.7265)*(-.1/.223) && yPosRatio < (xPosRatio+.285)*(.1/.224) && yPosRatio < (xPosRatio-2.288)*(-.447/.215)) {
+                return true
+            }
+            else {
+                console.log(xPosRatio+', '+yPosRatio)
+                return false    
+            }
+        }*/
+
+        ///I cannot for the life of me get this to work the way I want it to
+
         function moveCharacter(timestamp) {
             let elapsedMilliseconds = timestamp - lastTimestamp;
             let elapsedSeconds = elapsedMilliseconds / 1000;
@@ -157,10 +286,11 @@
 
             playerChar.style.left = (parseInt(playerChar.style.left) || 0) + normalizedMoveX * step + 'px';
             playerChar.style.top = (parseInt(playerChar.style.top) || 0) + normalizedMoveY * step + 'px';
-
+            
             requestAnimationFrame(moveCharacter);
         }
-
+        
+        setInitialPosition();
         requestAnimationFrame(moveCharacter);
     </script>
 </body>
