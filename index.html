@@ -1,297 +1,39 @@
 <!DOCTYPE html>
 <html lang="en-US">
-<head>
-    <meta charset="utf-8">
-    <title>jaden dot com</title>
-    <style>
-        @font-face {
-        font-family: 'RetroGame';
-        src: url('PressStart2P-Regular.ttf') format('truetype');
-        }
-
-        body {
-            height: 100vh;
-            width: 100vw;
-        }
-
-        canvas {
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            width: 1200px;
-            height: 675px;
-            border: 5px solid black;
-            transform: translate(-50%, -50%);
-        }
-
-        #room {
-            position: absolute;
-            z-index: -2;
-            top: 50%;
-            left: 50%;
-            height: auto;
-            width: 1200px;
-            transform: translate(-50%, -50%);
-        }
-
-        #walkable {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 1200px;
-            height: 675px;
-            /*background-color: rgba(0, 0, 0, 0.5);*/
-            clip-path: polygon(5.3% 55%, 27.5% 45%, 50% 55%, 72.3% 45%, 94.7% 55%, 94.7% 64.5%, 50% 86%, 5.3% 64.5%);
-        }
-
-        #me {
-            position: absolute;
-            transition: top 0.1s linear, left 0.1s linear;
-        }
-
-        #textContainer {
-            position: absolute;
-            z-index: 2;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            font-family: 'RetroGame';
-        }
-
-        #siteTitle {
-            position: absolute;
-            left: 615px;
-            top: 115px;
-            transform: rotate(-15deg) skew(-15deg);
-        }
-
-        #pageTitle {
-            position: absolute;
-            left: 155px;
-            top: 120px;
-            transform: rotate(-15deg) skew(-15deg);
-        }
-
-        #controls {
-            position: absolute;
-            top: 630px;
-            left: 20px;
-        }
-
-        .cautionTape {
-            position: absolute;
-            transform: scale(.2);
-        }
-
-        #door1 {
-            top: 260px;
-            left: -160px;
-        }
-
-        #door2 {
-            top: 220px;
-            left: -40px;
-        }
-
-        #door3 {
-            top: 220px;
-            left: 100px;
-        }
-
-        #door4 {
-            top: 260px;
-            left: 220px;
-        }
-
-        #door5 {
-            top: 260px;
-            left: 380px;
-        }
-
-        #door6 {
-            top: 220px;
-            left: 500px;
-        }
-
-        #door7 {
-            top: 220px;
-            left: 640px;
-        }
-
-        #door8 {
-            top: 260px;
-            left: 760px;
-        }
-
-    </style>
-</head>
-<body>
-    <canvas style="width: 1200px; height: 675px" id="canvas"></canvas>
-    <img id="room" src="scenes/homepage.svg" alt="a drawing of a museum room which serves as the site's homepage">
-    <div style="width: 1200px; height: 675px" id="walkable">
-        <img style="left: 0; top: 0" id="me" src="sprites/character-me-still-front-left.svg" alt="a pixel art character of the website's creator">
-    </div>
-    <div style="width: 1200px; height: 675px" id="textContainer">
-        <h3 id="siteTitle">jaden dot com</h3>
-        <h3 id="pageTitle">home</h3>
-        <h6 id="controls"> use the arrow keys or WASD to walk around the museum</h6>
-        <img class="cautionTape" id="door1" src="sprites/construction.gif" alt="caution tape showing this website is under construction">
-        <img class="cautionTape" id="door2" src="sprites/construction.gif">
-        <img class="cautionTape" id="door3" src="sprites/construction.gif">
-        <img class="cautionTape" id="door4" src="sprites/construction.gif">
-        <img class="cautionTape" id="door5" src="sprites/construction.gif">
-        <img class="cautionTape" id="door6" src="sprites/construction.gif">
-        <img class="cautionTape" id="door7" src="sprites/construction.gif">
-        <img class="cautionTape" id="door8" src="sprites/construction.gif">
-    </div>
-    
-    
-    <script>
-        let isArrowRightPressed = false;
-        let isArrowLeftPressed = false;
-        let isArrowUpPressed = false;
-        let isArrowDownPressed = false;
-        let playerChar = document.getElementById('me');
-        let facingLeft = true;
-        let currentFrame = 0;
-        let lastTimestamp = 0;
-        let frameRate = 3;
-        let step = 3;
-
-        function setInitialPosition() {
-            let floor = document.getElementById('walkable')
-            let Width = parseInt(floor.style.width);
-            let Height = parseInt(floor.style.height);
-            playerChar.style.left = `${Width * .47}px`
-            playerChar.style.top = `${Height * .7}px`
-        }
-
-        document.addEventListener('keydown', function(event) {
-            switch(event.key) {
-                case 'ArrowRight':
-                case 'd':
-                case 'D':
-                    event.preventDefault();
-                    isArrowRightPressed = true;
-                    facingLeft = false;
-                    break;
-                case 'ArrowLeft':
-                case 'a':
-                case 'A':
-                    event.preventDefault();
-                    isArrowLeftPressed = true;
-                    facingLeft = true;
-                    break;
-                case 'ArrowUp':
-                case 'w':
-                case 'W':
-                    event.preventDefault();
-                    isArrowUpPressed = true;
-                    break;
-                case 'ArrowDown':
-                case 's':
-                case 'S':
-                    event.preventDefault();
-                    isArrowDownPressed = true;
-                    break;
+	<head>
+		<meta charset="utf-8">
+		<title>jaden dot com</title>
+        <style>
+            #main {
+               height: 600px;
+               width: 800px;
+               border: 1px solid black;
+               image-rendering: pixelated;
             }
-        });
 
-        document.addEventListener('keyup', function(event) {
-            switch(event.key) {
-                case 'ArrowRight':
-                case 'd':
-                case 'D':
-                    isArrowRightPressed = false;
-                    playerChar.src = 'sprites/character-me-still-front-right.svg';
-                    break;
-                case 'ArrowLeft':
-                case 'a':
-                case 'A':
-                    isArrowLeftPressed = false;
-                    playerChar.src = 'sprites/character-me-still-front-left.svg';
-                    break;
-                case 'ArrowUp':
-                case 'w':
-                case 'W':
-                    isArrowUpPressed = false;
-                    if (facingLeft) {
-                        playerChar.src = 'sprites/character-me-still-front-left.svg'
-                    }
-                    if (!facingLeft) {
-                        playerChar.src = 'sprites/character-me-still-front-right.svg'
-                    }
-                    break;
-                case 'ArrowDown':
-                case 's':
-                case 'S':
-                    isArrowDownPressed = false;
-                    if (facingLeft) {
-                        playerChar.src = 'sprites/character-me-still-front-left.svg'
-                    }
-                    if (!facingLeft) {
-                        playerChar.src = 'sprites/character-me-still-front-right.svg'
-                    }                    
-                    break;
-            }
-        });
-
-        /*function playerCharOnFloor() {
-            let xPosRatio = parseInt(playerChar.style.left) / 1200;
-            let yPosRatio = parseInt(playerChar.style.top) / 675;
+        </style>
+	</head>
+	<body>
+        <canvas id="main"></canvas>
+        <div style="display: none; height: 64px; width: 64px">
+            <img height="64" width="64" id="character" src="sprites/character-me-still-front-right.png" alt="">
+        </div>
+	    <script>
             
-            if (0.053 <= xPosRatio <= 0.5 && yPosRatio > (xPosRatio-1.274)*(-.1/.222) && yPosRatio < (xPosRatio+.7375)*(.1/.225) && yPosRatio > (xPosRatio+1.288)*(.215/.447)) {
-                return true
-            }
-            if (0.5 <= xPosRatio <= 0.947 && yPosRatio > (xPosRatio-1.7265)*(-.1/.223) && yPosRatio < (xPosRatio+.285)*(.1/.224) && yPosRatio < (xPosRatio-2.288)*(-.447/.215)) {
-                return true
-            }
-            else {
-                console.log(xPosRatio+', '+yPosRatio)
-                return false    
-            }
-        }*/
-
-        ///I cannot for the life of me get this to work the way I want it to
-
-        function moveCharacter(timestamp) {
-            let elapsedMilliseconds = timestamp - lastTimestamp;
-            let elapsedSeconds = elapsedMilliseconds / 1000;
-            let frameTime = 1 / frameRate;
-
-            if (elapsedSeconds >= frameTime) {
-                currentFrame = (currentFrame === 1) ? 2 : 1;
-
-                if (isArrowRightPressed) {
-                    playerChar.src = `sprites/character-me-walking-front-right${currentFrame}.svg`;
-                } else if (isArrowLeftPressed) {
-                    playerChar.src = `sprites/character-me-walking-front-left${currentFrame}.svg`;
-                } else if (isArrowUpPressed || isArrowDownPressed) {
-                    if (facingLeft) {
-                        playerChar.src = `sprites/character-me-walking-front-left${currentFrame}.svg`;
-                    } else {
-                        playerChar.src = `sprites/character-me-walking-front-right${currentFrame}.svg`;
-                    }
-                }
-
-                lastTimestamp = timestamp;
+            function setup() {
+                const canvas = document.getElementById("main");
+                const ctx = canvas.getContext("2d");
+                const character = new Image();
+                image.onload = () => {
+                    ctx.drawImage(character, 0, 0);
+                };
+                character.src= "/sprites/character-me-still-front-left.png";
             }
 
-            let moveX = (isArrowRightPressed ? 1 : 0) - (isArrowLeftPressed ? 1 : 0);
-            let moveY = (isArrowDownPressed ? 1 : 0) - (isArrowUpPressed ? 1 : 0);
-            let length = Math.sqrt(moveX * moveX + moveY * moveY);
-            let normalizedMoveX = length === 0 ? 0 : moveX / length;
-            let normalizedMoveY = length === 0 ? 0 : moveY / length;
-
-            playerChar.style.left = (parseInt(playerChar.style.left) || 0) + normalizedMoveX * step + 'px';
-            playerChar.style.top = (parseInt(playerChar.style.top) || 0) + normalizedMoveY * step + 'px';
+            function draw() {
+            }
+            setup();
             
-            requestAnimationFrame(moveCharacter);
-        }
-        
-        setInitialPosition();
-        requestAnimationFrame(moveCharacter);
-    </script>
-</body>
+        </script>
+	</body>
 </html>
