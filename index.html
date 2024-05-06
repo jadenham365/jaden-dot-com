@@ -1,39 +1,97 @@
 <!DOCTYPE html>
-<html lang="en-US">
-	<head>
-		<meta charset="utf-8">
-		<title>jaden dot com</title>
-        <style>
-            #main {
-               height: 600px;
-               width: 800px;
-               border: 1px solid black;
-               image-rendering: pixelated;
-            }
+<html>
+<head>
+    <script src="https://nosir.github.io/obelisk.js/dist/obelisk.min.1.0.2.js"></script>
+    <style>
+        canvas {
+            padding: 0;
+            margin: auto;
+            display: block;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            image-rendering: crisp-edges;
+        }
 
-        </style>
-	</head>
-	<body>
-        <canvas id="main"></canvas>
-        <div style="display: none; height: 64px; width: 64px">
-            <img height="64" width="64" id="character" src="sprites/character-me-still-front-right.png" alt="">
-        </div>
-	    <script>
-            
-            function setup() {
-                const canvas = document.getElementById("main");
-                const ctx = canvas.getContext("2d");
-                const character = new Image();
-                image.onload = () => {
-                    ctx.drawImage(character, 0, 0);
-                };
-                character.src= "/sprites/character-me-still-front-left.png";
-            }
+        #main {
+            border: 1px solid black;
+            z-index: -1;
+            height: min(90vh, 67.5vw);
+            aspect-ratio: 4 / 3;
+        }
 
-            function draw() {
-            }
-            setup();
-            
-        </script>
-	</body>
+        #character {
+            z-index: 1;
+            height: min(15vh, 11.25vw);
+            border: 1px solid black;
+        }
+
+    </style>
+</head>
+<body>
+    <canvas id="main" width="256" height="192"></canvas>
+    <canvas id="character" width="32" height="32"></canvas>
+    <script>
+        // Environment
+
+        const canvas = document.getElementById("main");
+
+        const point = new obelisk.Point(127, 97);
+        const pixelView = new obelisk.PixelView(canvas, point);
+
+        const dimension = new obelisk.CubeDimension(128, 128, 5);
+        const gray = obelisk.ColorPattern.GRAY;
+        const color = new obelisk.CubeColor().getByHorizontalColor(gray);
+
+        const cube = new obelisk.Cube(dimension, color, true);
+        const p3d = new obelisk.Point3D(0, 0, 33);
+
+        pixelView.renderObject(cube, p3d);
+
+        // -----------------------------------------
+
+        // Character
+
+        const LEFT_STILL = 0;
+        const LEFT_WALK_1 = 32;
+        const LEFT_WALK_2 = 64;
+        const RIGHT_STILL = 96;
+        const RIGHT_WALK_1 = 128;
+        const RIGHT_WALK_2 = 160;
+
+        const character = document.getElementById("character");
+        const context = character.getContext('2d');
+        let image = new Image();
+        image.src = '/sprites/character-spritesheet.png';
+
+        image.onload = function() {
+            context.drawImage(
+                image,
+                //this var contols frame
+                LEFT_STILL,
+                // ------------------
+                0,
+                32,
+                32,
+                0,
+                0,
+                32,
+                32
+            );
+            console.log(window.innerWidth, window.innerHeight);
+        }
+
+        // -----------------------------------------
+
+        // Animating Movement
+
+
+        // -----------------------------------------
+
+
+
+    </script>
+</body>
 </html>
