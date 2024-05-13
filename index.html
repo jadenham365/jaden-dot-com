@@ -33,22 +33,37 @@
 <body>
     <canvas id="main" width="256" height="192"></canvas>
     <canvas id="character" width="32" height="32"></canvas>
+    
     <script>
+        
         // Environment
 
-        const canvas = document.getElementById("main");
+        let GLOBAL_WIDTH_CENTER = 127;
+        let GLOBAL_HEIGHT_CENTER = 97;
 
-        const point = new obelisk.Point(127, 97);
-        const pixelView = new obelisk.PixelView(canvas, point);
+        const canvas = document.getElementById("main");
+        const ctxMain = canvas.getContext("2d");
+
+        let point = new obelisk.Point(GLOBAL_WIDTH_CENTER, GLOBAL_HEIGHT_CENTER);
+        let pixelView = new obelisk.PixelView(canvas, point);
 
         const dimension = new obelisk.CubeDimension(128, 128, 5);
         const gray = obelisk.ColorPattern.GRAY;
         const color = new obelisk.CubeColor().getByHorizontalColor(gray);
 
         const cube = new obelisk.Cube(dimension, color, true);
-        const p3d = new obelisk.Point3D(0, 0, 33);
+        let p3d = new obelisk.Point3D(0, 0, 33);
 
-        pixelView.renderObject(cube, p3d);
+        function renderEnvironment() {
+            let point = new obelisk.Point(GLOBAL_WIDTH_CENTER, GLOBAL_HEIGHT_CENTER);
+            let pixelView = new obelisk.PixelView(canvas, point);
+            ctxMain.clearRect(0, 0, canvas.width, canvas.height);
+            pixelView.renderObject(cube, p3d);
+        }
+
+        document.body.onload = function() {
+            renderEnvironment();
+        }
 
         // -----------------------------------------
 
@@ -80,16 +95,253 @@
                 32,
                 32
             );
-            console.log(window.innerWidth, window.innerHeight);
         }
 
         // -----------------------------------------
 
-        // Animating Movement
+         // Sprite Animation Function
+
+        let animationRunning = false;
+        const charInt = 15;
+        const envInt = 2;
+        let leftCount = 0;
+        let rightCount = 0;
+        let facingLeft = true;
+        let up = false;
+        let down = false;
+        let left = false;
+        let right = false;
+
+            function moveLeft() {
+                if (animationRunning) {
+                    if (leftCount == 0) {
+                        context.clearRect(0, 0, image.width, image.height);
+                        context.drawImage(image, LEFT_WALK_1, 0, 32, 32, 0, 0, 32, 32);
+                    } else if (leftCount == charInt) {
+                        context.clearRect(0, 0, image.width, image.height);
+                        context.drawImage(image, LEFT_WALK_2, 0, 32, 32, 0, 0, 32, 32);
+                    }
+                    leftCount = (leftCount + 1) % (charInt * 2);
+                    
+                    if (up && left) {
+                        GLOBAL_WIDTH_CENTER+=envInt;
+                        GLOBAL_HEIGHT_CENTER+=envInt;
+                    } else if (down && left) {
+                        GLOBAL_WIDTH_CENTER+=envInt;
+                        GLOBAL_HEIGHT_CENTER-=envInt;
+                    } else if (up) {
+                        GLOBAL_HEIGHT_CENTER+=envInt;
+                    } else if (down) {
+                        GLOBAL_HEIGHT_CENTER-=envInt;
+                    } else {
+                        GLOBAL_WIDTH_CENTER+=envInt;
+                    }
+                    
+                    renderEnvironment();
+                    requestAnimationFrame(moveLeft);
+                }
+            }
+
+            function moveRight() {
+                if (animationRunning) {
+                    if (rightCount == 0) {
+                    context.clearRect(0, 0, image.width, image.height);
+                    context.drawImage(image, RIGHT_WALK_1, 0, 32, 32, 0, 0, 32, 32);
+                    } else if (rightCount == charInt) {
+                        context.clearRect(0, 0, image.width, image.height);
+                        context.drawImage(image, RIGHT_WALK_2, 0, 32, 32, 0, 0, 32, 32);
+                    }
+                    rightCount = (rightCount + 1) % (charInt * 2);
+
+                    if (up && right) {
+                        GLOBAL_WIDTH_CENTER-=envInt;
+                        GLOBAL_HEIGHT_CENTER+=envInt;
+                    } else if (down && right) {
+                        GLOBAL_WIDTH_CENTER-=envInt;
+                        GLOBAL_HEIGHT_CENTER-=envInt;
+                    } else if (up) {
+                        GLOBAL_HEIGHT_CENTER+=envInt;
+                    } else if (down) {
+                        GLOBAL_HEIGHT_CENTER-=envInt;
+                    } else {
+                        GLOBAL_WIDTH_CENTER-=envInt;
+                    }
+                    
+                    renderEnvironment();
+                    requestAnimationFrame(moveRight);
+                }
+            }
+
+        // -----------------------------------------
+
+
+        // Movement Logic
+
+        function handleKeyDown(event) {
+            // Log the key code for debugging
+            console.log("Key pressed:", event.keyCode);
+
+            switch (event.key) {
+                case "ArrowUp":
+                case "W":
+                case "w":
+                    if (!down) {
+                        up = true;
+                        if (!animationRunning) {
+                            animationRunning = true;
+                            if (facingLeft) {
+                                requestAnimationFrame(moveLeft);
+                            } else {
+                                requestAnimationFrame(moveRight);
+                            }
+                        }
+                    }
+                    break;
+                case "ArrowDown":
+                case "S":
+                case "s":
+                    if (!up) {
+                        down = true;
+                        if (!animationRunning) {
+                            animationRunning = true;
+                            if (facingLeft) {
+                                requestAnimationFrame(moveLeft);
+                            } else {
+                                requestAnimationFrame(moveRight);
+                            }
+                        }
+                    }
+                    break;
+                case "ArrowLeft":
+                case "A":
+                case "a":
+                    facingLeft = true;
+                    if (!right) {
+                        left = true;
+                        if (!animationRunning) {
+                            animationRunning = true;
+                            requestAnimationFrame(moveLeft);
+                        }
+                    }
+                    break;
+                case "ArrowRight":
+                case "D":
+                case "d":
+                    facingLeft = false;
+                    if (!left) {
+                        right = true;
+                        if (!animationRunning) {
+                            animationRunning = true;
+                            requestAnimationFrame(moveRight);
+                        }       
+                    }     
+                    break;
+                case "ArrowUpArrowLeft":
+                case "ES":
+                case "es":
+                    left = true;
+                    up = true;
+                    if (!animationRunning) {
+                        animationRunning = true;
+                        requestAnimationFrame(moveLeft);
+                    }
+                    break;
+                case "ArrowDownArrowLeft":
+                case "DS":
+                case "ds":
+                    left = true;
+                    down = true;
+                    if (!animationRunning) {
+                        animationRunning = true;
+                        requestAnimationFrame(moveLeft);
+                    }
+                    break;
+                case "ArrowUpArrowRight":
+                case "EF":
+                case "ef":
+                    right = true;
+                    up = true;
+                    if (!animationRunning) {
+                        animationRunning = true;
+                        requestAnimationFrame(moveRight);
+                    }                
+                    break;
+                case "ArrowDownArrowRight":
+                case "DF":
+                case "df":
+                    right = true;
+                    down = true;
+                    if (!animationRunning) {
+                        animationRunning = true;
+                        requestAnimationFrame(moveRight);
+                    }                
+                    break;
+                default:
+                    // Ignore other keys
+                    break;
+            }
+        }
+
+        function handleKeyUp(event) {
+                switch(event.key) {
+                    case "ArrowUp":
+                    case "W":
+                    case "w":
+                        up = false;
+                        if (!right && !left) {
+                            animationRunning = false;
+                            context.clearRect(0, 0, image.width, image.height);
+                            if (facingLeft) {
+                                context.drawImage(image, LEFT_STILL, 0, 32, 32, 0, 0, 32, 32);
+                            } else {
+                                context.drawImage(image, RIGHT_STILL, 0, 32, 32, 0, 0, 32, 32);
+                            }
+                        }
+                        break;
+                    case "ArrowDown":
+                    case "S":
+                    case "s":
+                        down = false;
+                        if (!right && !left) {
+                            animationRunning = false;
+                            context.clearRect(0, 0, image.width, image.height);
+                            if (facingLeft) {
+                                context.drawImage(image, LEFT_STILL, 0, 32, 32, 0, 0, 32, 32);
+                            } else {
+                                context.drawImage(image, RIGHT_STILL, 0, 32, 32, 0, 0, 32, 32);
+                            }
+                        }
+                        break;
+                    case "ArrowLeft":
+                    case "A":
+                    case "a":
+                        left = false;
+                        if (!up && !down) {
+                            animationRunning = false;
+                            context.clearRect(0, 0, image.width, image.height);
+                            context.drawImage(image, LEFT_STILL, 0, 32, 32, 0, 0, 32, 32);
+                        }
+                        break;
+                    case "ArrowRight":
+                    case "D":
+                    case "d":
+                        right = false;
+                        if (!up && !down) {
+                            animationRunning = false;
+                            context.clearRect(0, 0, image.width, image.height);
+                            context.drawImage(image, RIGHT_STILL, 0, 32, 32, 0, 0, 32, 32);
+                        }
+                        break;
+                }
+        }
+
+        document.body.addEventListener("keydown", handleKeyDown);
+        document.body.addEventListener("keyup", handleKeyUp);
 
 
         // -----------------------------------------
 
+       
 
 
     </script>
