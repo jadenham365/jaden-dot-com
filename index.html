@@ -72,10 +72,10 @@
         function renderFloor() {
             let point = new obelisk.Point(GLOBAL_WIDTH_CENTER, GLOBAL_HEIGHT_CENTER);
             let pixelView = new obelisk.PixelView(canvas, point);
-            for (let i = 0; i < 2; i++) {
-                for (let j = 0; j < 4; j++) {
+            for (let i = 0; i < 16; i++) {
+                for (let j = 0; j < 3; j++) {
                     pixelView.renderObject(new obelisk.Cube(dimension, color, true), 
-                                            new obelisk.Point3D(8*j, 64*i, 0));
+                                            new obelisk.Point3D(8*i, 64*j - 32* (i%2), 0));
                 }
             }
         }
@@ -127,8 +127,8 @@
          // Sprite Animation Function
 
         let animationRunning = false;
-        const charInt = 60;
-        const envInt = 150;
+        const charInt = 20;
+        const envInt = 0.003;
         let leftCount = 0;
         let rightCount = 0;
         let facingLeft = true;
@@ -141,8 +141,8 @@
         let windowWidth = window.innerWidth;
         let canvasHeight = Math.min(windowHeight * (12 / 13), 0.75 * windowWidth * (16 / 17));
         let canvasWidth = canvasHeight * (4 / 3);
-        let linMove = canvasWidth * 0.001;
-        let diagMove = canvasHeight * 0.001;
+        let linMove = canvasWidth * envInt;
+        let diagMove = canvasHeight * envInt;
         let topPosition = windowHeight / 2;
         let leftPosition = windowWidth / 2;
 
@@ -345,8 +345,8 @@
             windowWidth = window.innerWidth;
             canvasHeight = Math.min(windowHeight * (12 / 13), 0.75 * windowWidth * (16 / 17));
             canvasWidth = canvasHeight * (4 / 3);
-            linMove = canvasWidth * 0.001;
-            diagMove = canvasHeight * 0.001;
+            linMove = canvasWidth * envInt;
+            diagMove = canvasHeight * envInt;
 
             topPosition = (windowHeight / 2) + (canvasHeight / prevCanH) * (prevTPos - (prevWinH / 2));
             leftPosition = (windowWidth / 2) + (canvasWidth / prevCanW) * (prevLPos - (prevWinW / 2));
