@@ -2,44 +2,60 @@
 <html>
 <head>
     <script src="https://nosir.github.io/obelisk.js/dist/obelisk.min.1.0.2.js"></script>
+    
     <style>
-        canvas {
-            padding: 0;
-            margin: auto;
-            display: block;
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            image-rendering: crisp-edges;
+
+        body {
+            overflow: hidden;
         }
 
+
         #main {
-            border: 1px solid black;
-            z-index: -1;
-            height: min(90vh, 67.5vw);
-            aspect-ratio: 4 / 3;
+            position: absolute;
+            z-index: 1;
             background-color: black;
+            image-rendering: crisp-edges;
+            height: min(calc(200vh * (12 / 13)), calc(150vw * (16 / 17)));
+            width: auto;
+            transform: translate(-50%, -50%);
         }
 
         #character {
-            z-index: 1;
-            height: min(15vh, 11.25vw);
+            position: absolute;
+            z-index: 2;
+            image-rendering: crisp-edges;
+            height: min(calc(100vh * (2 / 13)), calc(75vw * (8 / 51)));
+            width: auto;
+            transform: translate(-50%, -50%);
         }
+
+        #pixel {
+            background-color:red;
+            z-index: 3;
+            position: absolute;
+            height: 8px;
+            width: 8px;
+            top: 100px;
+            left: 100px;
+        }
+
+      
 
     </style>
 </head>
 <body>
-    <canvas id="main" width="256" height="192"></canvas>
-    <canvas id="character" width="32" height="32"></canvas>
+    <canvas id="main" width="512" height="384" style="top: 50%; left: 50%;"></canvas>
+    <canvas id="character" width="32" height="32" style="top: 50%; left: 50%;"></canvas>
+    <canvas id="pixel" width="1" height="1"></canvas>
+
+    
     
     <script>
-        
+                
         // Environment
 
-        let GLOBAL_WIDTH_CENTER = 127;
-        let GLOBAL_HEIGHT_CENTER = 97;
+        let GLOBAL_WIDTH_CENTER = 255;
+        let GLOBAL_HEIGHT_CENTER = 191;
 
         const canvas = document.getElementById("main");
         const ctxMain = canvas.getContext("2d");
@@ -47,18 +63,27 @@
         let point = new obelisk.Point(GLOBAL_WIDTH_CENTER, GLOBAL_HEIGHT_CENTER);
         let pixelView = new obelisk.PixelView(canvas, point);
 
-        const dimension = new obelisk.CubeDimension(256, 256, 5);
-        const gray = obelisk.ColorPattern.GRAY;
-        const color = new obelisk.CubeColor().getByHorizontalColor(gray);
+        const dimension = new obelisk.CubeDimension(8, 64, 6);
+        const dark = new obelisk.CubeColor(0x312118, 0x312118, 0x552910, 0x552910, 0x552910);
+        const regular = new obelisk.CubeColor(0x312118, 0x312118, 0x97460b, 0x97460b, 0x97460b);
+        const light = new obelisk.CubeColor(0x312118, 0x312118, 0x946547, 0x946547, 0x946547);
+        const color = new obelisk.CubeColor(0x312118, 0x946547, 0x552910, 0x552910, 0x97460b);
 
-        const cube = new obelisk.Cube(dimension, color, true);
-        let p3d = new obelisk.Point3D(0, 0, 33);
-
-        function renderEnvironment() {
+        function renderFloor() {
             let point = new obelisk.Point(GLOBAL_WIDTH_CENTER, GLOBAL_HEIGHT_CENTER);
             let pixelView = new obelisk.PixelView(canvas, point);
+            for (let i = 0; i < 2; i++) {
+                for (let j = 0; j < 4; j++) {
+                    pixelView.renderObject(new obelisk.Cube(dimension, color, true), 
+                                            new obelisk.Point3D(8*j, 64*i, 0));
+                }
+            }
+        }
+        
+        
+        function renderEnvironment() {
             ctxMain.clearRect(0, 0, canvas.width, canvas.height);
-            pixelView.renderObject(cube, p3d);
+            renderFloor();
         }
 
         document.body.onload = function() {
@@ -102,8 +127,8 @@
          // Sprite Animation Function
 
         let animationRunning = false;
-        const charInt = 30;
-        const envInt = 1;
+        const charInt = 60;
+        const envInt = 150;
         let leftCount = 0;
         let rightCount = 0;
         let facingLeft = true;
@@ -111,6 +136,19 @@
         let down = false;
         let left = false;
         let right = false;
+
+        let windowHeight = window.innerHeight;
+        let windowWidth = window.innerWidth;
+        let canvasHeight = Math.min(windowHeight * (12 / 13), 0.75 * windowWidth * (16 / 17));
+        let canvasWidth = canvasHeight * (4 / 3);
+        let linMove = canvasWidth * 0.001;
+        let diagMove = canvasHeight * 0.001;
+        let topPosition = windowHeight / 2;
+        let leftPosition = windowWidth / 2;
+
+
+        console.log(`canvas: ${canvasHeight}, ${canvasWidth}`)
+
 
             function move() {
                 if (animationRunning) {
@@ -125,17 +163,17 @@
                         leftCount = (leftCount + 1) % (charInt * 2);
                         
                         if (up && left) {
-                            GLOBAL_WIDTH_CENTER+=envInt;
-                            GLOBAL_HEIGHT_CENTER+=envInt;
+                            topPosition += diagMove;
+                            leftPosition += diagMove;
                         } else if (down && left) {
-                            GLOBAL_WIDTH_CENTER+=envInt;
-                            GLOBAL_HEIGHT_CENTER-=envInt;
+                            topPosition -= diagMove;
+                            leftPosition += diagMove;
                         } else if (up) {
-                            GLOBAL_HEIGHT_CENTER+=envInt;
+                            topPosition += linMove;
                         } else if (down) {
-                            GLOBAL_HEIGHT_CENTER-=envInt;
+                            topPosition -= linMove;
                         } else {
-                            GLOBAL_WIDTH_CENTER+=envInt;
+                            leftPosition += linMove;
                         }
                     } else {
                         if (rightCount == 0) {
@@ -148,20 +186,23 @@
                         rightCount = (rightCount + 1) % (charInt * 2);
 
                         if (up && right) {
-                            GLOBAL_WIDTH_CENTER-=envInt;
-                            GLOBAL_HEIGHT_CENTER+=envInt;
+                            topPosition += diagMove;
+                            leftPosition -= diagMove;
                         } else if (down && right) {
-                            GLOBAL_WIDTH_CENTER-=envInt;
-                            GLOBAL_HEIGHT_CENTER-=envInt;
+                            topPosition -= diagMove;
+                            leftPosition -= diagMove;
                         } else if (up) {
-                            GLOBAL_HEIGHT_CENTER+=envInt;
+                            topPosition += linMove;
                         } else if (down) {
-                            GLOBAL_HEIGHT_CENTER-=envInt;
+                            topPosition -= linMove;
                         } else {
-                            GLOBAL_WIDTH_CENTER-=envInt;
+                            leftPosition -= linMove;
                         }
                     }
-                    renderEnvironment();
+                
+                    canvas.style.top = `${topPosition}px`;
+                    canvas.style.left = `${leftPosition}px`;
+
                     requestAnimationFrame(move);
                 }
             }
@@ -172,8 +213,9 @@
         // Movement Logic
 
         function handleKeyDown(event) {
+            event.preventDefault();
             // Log the key code for debugging
-            console.log("Key pressed:", event.keyCode);
+            console.log("X,Y:", leftPosition, topPosition);
 
             switch (event.key) {
                 case "ArrowUp":
@@ -284,6 +326,41 @@
 
 
         // -----------------------------------------
+
+        // Handle Window Resizing
+        console.log("X,Y:", leftPosition, topPosition);
+
+
+        function handleResize() {
+            console.log("X,Y:", leftPosition, topPosition);
+
+            let prevWinH = windowHeight;
+            let prevWinW = windowWidth;
+            let prevCanH = canvasHeight;
+            let prevCanW = canvasWidth;
+            let prevTPos = topPosition;
+            let prevLPos = leftPosition;
+
+            windowHeight = window.innerHeight;
+            windowWidth = window.innerWidth;
+            canvasHeight = Math.min(windowHeight * (12 / 13), 0.75 * windowWidth * (16 / 17));
+            canvasWidth = canvasHeight * (4 / 3);
+            linMove = canvasWidth * 0.001;
+            diagMove = canvasHeight * 0.001;
+
+            topPosition = (windowHeight / 2) + (canvasHeight / prevCanH) * (prevTPos - (prevWinH / 2));
+            leftPosition = (windowWidth / 2) + (canvasWidth / prevCanW) * (prevLPos - (prevWinW / 2));
+
+            canvas.style.top = `${topPosition}px`;
+            canvas.style.left = `${leftPosition}px`;
+        }
+
+        window.addEventListener("resize", handleResize);
+        
+
+        // -----------------------------------------
+
+       
 
        
 
