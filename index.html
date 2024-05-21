@@ -60,7 +60,7 @@
         const canvas = document.getElementById("main");
         const ctxMain = canvas.getContext("2d");
         let mainRoom = new Image();
-        mainRoom.src = 'sprites/main-room.png';
+        mainRoom.src = "sprites/main-room.png";
 
         mainRoom.onload = function() {
             ctxMain.drawImage(
@@ -82,7 +82,7 @@
         const character = document.getElementById("character");
         const context = character.getContext('2d');
         let image = new Image();
-        image.src = '/sprites/character-spritesheet.png';
+        image.src = "sprites/character-spritesheet.png";
 
         image.onload = function() {
             context.drawImage(
