@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <script src="https://nosir.github.io/obelisk.js/dist/obelisk.min.1.0.2.js"></script>
     
     <style>
 
@@ -15,7 +14,7 @@
             z-index: 1;
             background-color: black;
             image-rendering: crisp-edges;
-            height: min(calc(200vh * (12 / 13)), calc(150vw * (16 / 17)));
+            height: min(calc(300vh * (12 / 13)), calc(225vw * (16 / 17)));
             width: auto;
             transform: translate(-50%, -50%);
         }
@@ -29,65 +28,44 @@
             transform: translate(-50%, -50%);
         }
 
-        #pixel {
-            background-color:red;
-            z-index: 3;
+
+        #screen {
             position: absolute;
-            height: 8px;
-            width: 8px;
-            top: 100px;
-            left: 100px;
+            z-index: 3;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            height: min(calc(100vh * (12 / 13)), calc(75vw * (16 / 17)));
+            width: auto;
+            aspect-ratio: 4 / 3;
+            overflow: hidden;
+            border: solid 100vw white;
         }
+
 
       
 
     </style>
 </head>
 <body>
-    <canvas id="main" width="512" height="384" style="top: 50%; left: 50%;"></canvas>
-    <canvas id="character" width="32" height="32" style="top: 50%; left: 50%;"></canvas>
-    <canvas id="pixel" width="1" height="1"></canvas>
-
     
+    <canvas id="main" width="768" height="576" style="top: 50%; left: 50%;"></canvas>
+    <canvas id="character" width="32" height="32" style="top: 50%; left: 50%;"></canvas>
+    <div id="screen"></div>
     
     <script>
                 
         // Environment
 
-        let GLOBAL_WIDTH_CENTER = 255;
-        let GLOBAL_HEIGHT_CENTER = 191;
-
         const canvas = document.getElementById("main");
         const ctxMain = canvas.getContext("2d");
+        let mainRoom = new Image();
+        mainRoom.src = 'sprites/main-room.png';
 
-        let point = new obelisk.Point(GLOBAL_WIDTH_CENTER, GLOBAL_HEIGHT_CENTER);
-        let pixelView = new obelisk.PixelView(canvas, point);
-
-        const dimension = new obelisk.CubeDimension(8, 64, 6);
-        const dark = new obelisk.CubeColor(0x312118, 0x312118, 0x552910, 0x552910, 0x552910);
-        const regular = new obelisk.CubeColor(0x312118, 0x312118, 0x97460b, 0x97460b, 0x97460b);
-        const light = new obelisk.CubeColor(0x312118, 0x312118, 0x946547, 0x946547, 0x946547);
-        const color = new obelisk.CubeColor(0x312118, 0x946547, 0x552910, 0x552910, 0x97460b);
-
-        function renderFloor() {
-            let point = new obelisk.Point(GLOBAL_WIDTH_CENTER, GLOBAL_HEIGHT_CENTER);
-            let pixelView = new obelisk.PixelView(canvas, point);
-            for (let i = 0; i < 16; i++) {
-                for (let j = 0; j < 3; j++) {
-                    pixelView.renderObject(new obelisk.Cube(dimension, color, true), 
-                                            new obelisk.Point3D(8*i, 64*j - 32* (i%2), 0));
-                }
-            }
-        }
-        
-        
-        function renderEnvironment() {
-            ctxMain.clearRect(0, 0, canvas.width, canvas.height);
-            renderFloor();
-        }
-
-        document.body.onload = function() {
-            renderEnvironment();
+        mainRoom.onload = function() {
+            ctxMain.drawImage(
+                mainRoom, 0, 0, 768, 576, 0, 0, 768, 576
+            );
         }
 
         // -----------------------------------------
@@ -127,8 +105,8 @@
          // Sprite Animation Function
 
         let animationRunning = false;
-        const charInt = 20;
-        const envInt = 0.003;
+        const charInt = 15;
+        const envInt = 0.004;
         let leftCount = 0;
         let rightCount = 0;
         let facingLeft = true;
