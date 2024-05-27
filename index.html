@@ -3,6 +3,11 @@
 <head>
     
     <style>
+        @font-face {
+            font-family: 'DP';
+            src: url('pokemon-dp-pro.ttf');
+            }
+
 
         body {
             overflow: hidden;
@@ -44,6 +49,41 @@
             border: solid 100vw white;
         }
 
+        #textbox {
+            position: relative;
+            background-color: rgba(0, 0, 0, 0.5);
+            height: 30%;
+            width: 90%;
+            left: 50%;
+            top: 80%;
+            transform: translate(-50%, -50%);
+            font-family: DP;
+            font-size: min(calc(8vh * (12 / 13)), calc(6vw * (16 / 17)));
+            color: white;
+            padding: 1%;
+        }
+
+        #button-container {
+            position: absolute;
+            z-index: 1;
+            height: min(calc(300vh * (12 / 13)), calc(225vw * (16 / 17)));
+            width: auto;
+            aspect-ratio: 4 / 3;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        #enter-about {
+            position: relative;
+            top: 60%;
+            left: 24%;
+            transform: translate(-50%, -50%);
+            font-family: 'DP';
+            font-size: min(calc(8vh * (12 / 13)), calc(6vw * (16 / 17)));
+        }
+
+    
 
       
 
@@ -52,8 +92,15 @@
 <body>
     
     <canvas id="main" width="768" height="576" style="top: 50%; left: 50%;"></canvas>
+    <div id="button-container">
+        <button id="enter-about">Enter</button>
+    </div>
     <canvas id="character" width="32" height="32" style="top: 50%; left: 50%;"></canvas>
-    <div id="screen"></div>
+    <div id="screen">
+        <div id="textbox" style="visibility: visible;">Pardon our pixels! Use WASD or the arrow keys to walk around. Use the mouse to click buttons. sPress X to toggle this message.</div>
+    </div>
+    
+
     
     <script>
                 
@@ -125,6 +172,8 @@
         let diagMove = canvasHeight * envInt;
         let topPosition = windowHeight / 2;
         let leftPosition = windowWidth / 2;
+
+        let buttons = document.getElementById("button-container");
 
         function charX(winWidth, canWidth, leftOff) {
             let result = ((((winWidth / 2) - leftOff) / canWidth) * 256) + 384;
@@ -219,6 +268,8 @@
                 
                     canvas.style.top = `${topPosition}px`;
                     canvas.style.left = `${leftPosition}px`;
+                    buttons.style.top = `${topPosition}px`;
+                    buttons.style.left = `${leftPosition}px`;
 
                     requestAnimationFrame(move);
                 }
@@ -229,9 +280,11 @@
 
         // Movement Logic
 
+        let textbox = document.getElementById('textbox');
+        let textboxVisible = true;
+
         function handleKeyDown(event) {
             event.preventDefault();
-            // Log the key code for debugging
             
 
 
@@ -334,6 +387,16 @@
                             context.drawImage(image, RIGHT_STILL, 0, 32, 32, 0, 0, 32, 32);
                         }
                         break;
+                    case "X":
+                    case "x":
+                        if (textboxVisible) {
+                            textbox.style.visibility = 'hidden';
+                            textboxVisible = false;
+                        } else {
+                            textbox.style.visibility = 'visible';
+                            textboxVisible = true;
+                        }
+                        
                 }
         }
 
@@ -366,6 +429,8 @@
 
             canvas.style.top = `${topPosition}px`;
             canvas.style.left = `${leftPosition}px`;
+            buttons.style.top = `${topPosition}px`;
+            buttons.style.left = `${leftPosition}px`;
         }
 
         window.addEventListener("resize", handleResize);
@@ -373,7 +438,12 @@
 
         // -----------------------------------------
 
-       
+        //Button
+
+        let enterAbout = document.getElementById("enter-about");
+        
+
+        // -----------------------------------------
 
        
 
