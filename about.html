@@ -13,10 +13,10 @@
             position: absolute;
             z-index: 1;
             image-rendering: crisp-edges;
-            height: min(calc(300vh * (12 / 13)), calc(225vw * (16 / 17)));
+            height: min(calc(400vh * (12 / 13)), calc(300vw * (16 / 17)));
             width: auto;
             transform: translate(-50%, -50%);
-            background-color: black;
+            background-color: rgb(0, 0, 0);
 
         }
 
@@ -51,7 +51,7 @@
 </head>
 <body>
     
-    <canvas id="main" width="768" height="576" style="top: 50%; left: 50%;"></canvas>
+    <canvas id="main" width="1024" height="768" style="top: 50%; left: 50%;"></canvas>
     <canvas id="character" width="32" height="32" style="top: 50%; left: 50%;"></canvas>
     <div id="screen"></div>
     
@@ -62,11 +62,11 @@
         const canvas = document.getElementById("main");
         const ctxMain = canvas.getContext("2d");
         let mainRoom = new Image();
-        mainRoom.src = "sprites/main-room.png";
+        mainRoom.src = "sprites/about-room.png";
 
         mainRoom.onload = function() {
             ctxMain.drawImage(
-                mainRoom, 0, 0, 768, 576, 0, 0, 768, 576
+                mainRoom, 0, 0, 1024, 768, 0, 0, 1024, 768
             );
         }
 
@@ -137,7 +137,7 @@
         }
 
         function inBounds(x, y) {
-            if (x < 632 && x > 136 && y > 272 && (x < (2*y - 136)) && (x < (-2*y + 1448)) && (x > (2*y - 680)) && (x > (-2*y + 904))) {
+            if (y > -0.5*x + 206 && y > 0.5*x + 18 && y < 0.5*x + 170) {
                 return true;
             }
             return false;
@@ -219,6 +219,8 @@
                 
                     canvas.style.top = `${topPosition}px`;
                     canvas.style.left = `${leftPosition}px`;
+
+                    console.log(`${charX(windowWidth, canvasWidth, leftPosition)}, ${charY(windowHeight, canvasHeight, topPosition)}`);
 
                     requestAnimationFrame(move);
                 }
@@ -373,9 +375,27 @@
 
         // -----------------------------------------
 
+        // Mouse
+
+        function getMousePos(event) {
+            let mouseWinX = event.clientX;
+            let mouseWinY = event.clientY;
+            let mouseCanX = mouseWinX - ((windowWidth - canvasWidth) / 2);
+            let mouseCanY = mouseWinY - ((windowHeight - canvasHeight) / 2);
+            
+            console.log(`mouseX ${mouseWinX}, mouseY ${mouseWinY}`);
+
+            if (mouseCanX >= 0 && mouseCanX <= canvasWidth && mouseCanY >= 0 && mouseCanY <= canvasHeight) {
+                console.log(`${mouseCanX}, ${mouseCanY}`);
+            }
+            
+        }
+
+        window.addEventListener("mousedown", getMousePos);
        
 
        
+        // -----------------------------------------
 
 
     </script>
