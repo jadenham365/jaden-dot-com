@@ -17,7 +17,7 @@
         #main {
             position: absolute;
             z-index: 1;
-            image-rendering: crisp-edges;
+            image-rendering: pixelated;
             height: min(calc(300vh * (12 / 13)), calc(225vw * (16 / 17)));
             width: auto;
             transform: translate(-50%, -50%);
@@ -28,7 +28,7 @@
         #character {
             position: absolute;
             z-index: 2;
-            image-rendering: crisp-edges;
+            image-rendering: pixelated;
             height: min(calc(100vh * (2 / 13)), calc(75vw * (8 / 51)));
             width: auto;
             transform: translate(-50%, -50%);
@@ -97,7 +97,7 @@
     </div>
     <canvas id="character" width="32" height="32" style="top: 50%; left: 50%;"></canvas>
     <div id="screen">
-        <div id="textbox" style="visibility: visible;">Pardon our pixels! Use WASD or the arrow keys to walk around. Use the mouse to click buttons. sPress X to toggle this message.</div>
+        <div id="textbox" style="visibility: visible;">Pardon our pixels! Use WASD or the arrow keys to walk around. Use the mouse to click buttons. Press X to toggle this message.</div>
     </div>
     
 
